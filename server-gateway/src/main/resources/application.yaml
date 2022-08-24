@@ -17,6 +17,8 @@ spring:
           '[/**]': #只要有人处理请求了，这个跨域就能生效
             allowedOrigins: "*" #允许所有地址来源跨域
             allowedMethods: "*" #允许所有请求方式跨域
+            allowedHeaders: "*" #允许各种复杂请求头
+            allowCredentials: true #允许带一些安全标致跨域 比如：Cookie
       routes:
         - id: product_route
           uri: lb://service-product # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
