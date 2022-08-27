@@ -7,6 +7,8 @@ import com.atguigu.gmall.model.product.BaseCategory3;
 import com.atguigu.gmall.product.service.BaseCategory1Service;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
 import com.atguigu.gmall.product.service.BaseCategory3Service;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import java.util.List;
 
 //@ResponseBody   所有的响应数据都直接写给浏览器（如果是对象写成json，如果是文本就写成普通字符串）
 //@Controller 这个类是来接受请求的
+@Api(tags = "分类管理属性")
 @RestController
 @RequestMapping("/admin/product")
 public class CategoryController {
@@ -31,6 +34,7 @@ public class CategoryController {
 //  admin/product/getCategory1
 // {code:2000,message:"ok",data: [{id:1},{id:2},{id:3}]}
 //利用MyBatisPlus提供好的CRUD方法，直接查出所有一级分类
+    @ApiOperation("获取一级分类")
     @GetMapping("/getCategory1")
  public Result getCategory1(){
      List<BaseCategory1> list = baseCategory1Service.list();
@@ -38,7 +42,7 @@ public class CategoryController {
  }
 
 // http://192.168.200.1/admin/product/getCategory2/2
-
+@ApiOperation("获取二级分类")
     @GetMapping("/getCategory2/{c1Id}")
     public Result getCategory2(@PathVariable("c1Id") Long c1Id){
 //     查询出 父分类id是c1Id的所有二级分类
@@ -47,6 +51,7 @@ public class CategoryController {
     }
 
 //    获取三级分类
+@ApiOperation("获取三级分类")
     @GetMapping("/getCategory3/{c2Id}")
     public Result getCategor3(@PathVariable("c2Id") Long c2Id){
 //        查询出 父分类id是C2Id的所有三级分类

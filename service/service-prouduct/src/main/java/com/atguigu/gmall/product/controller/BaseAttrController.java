@@ -5,6 +5,8 @@ import com.atguigu.gmall.model.product.BaseAttrInfo;
 import com.atguigu.gmall.model.product.BaseAttrValue;
 import com.atguigu.gmall.product.service.BaseAttrInfoService;
 import com.atguigu.gmall.product.service.BaseAttrValueService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import java.util.List;
 /*
 * 平台属性相关api
 * */
+@Api(tags = "平台属性相关api")
 @RequestMapping("/admin/product")
 @RestController
 public class BaseAttrController {
@@ -22,6 +25,7 @@ public class BaseAttrController {
     @Autowired
     BaseAttrValueService baseAttrValueService;
     //admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id}
+    @ApiOperation("根据分类id获取平台属性")
     @GetMapping("/attrInfoList/{c1Id}/{c2Id}/{c3Id}")
     public Result getAttrInfoList(@PathVariable("c1Id") Long c1Id,
                                @PathVariable("c2Id") Long c2Id,
@@ -47,6 +51,7 @@ public class BaseAttrController {
      */
 //    添加平台属性
 //    http://api.gmall.com/admin/product/saveAttrInfo
+    @ApiOperation("添加平台属性")
     @PostMapping("/saveAttrInfo")
     public Result saveAttrInfo(@RequestBody BaseAttrInfo info){
 
@@ -58,6 +63,7 @@ public class BaseAttrController {
 
 //    admin/product/getAttrValueList/11
 //    根据平台属性id 查询对应的平台属性值
+    @ApiOperation("根据平台属性ID获取平台属性对象数据")
     @GetMapping("/getAttrValueList/{attrId}")
     public Result getAttrValueList(@PathVariable("attrId") Long attrId ){
 
