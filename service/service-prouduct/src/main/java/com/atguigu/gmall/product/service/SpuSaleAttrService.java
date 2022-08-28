@@ -14,6 +14,8 @@ import java.util.List;
 public interface SpuSaleAttrService extends IService<SpuSaleAttr> {
     List<SpuSaleAttr> getSaleAttrAndValueBySpuId(Long spuId);
 
+    List<SpuSaleAttr> getSaleAttrAndValueMarkSku(Long spuId, Long skuId);
+
 
 //根据spuId查询对应的所有销售属性名和值
 

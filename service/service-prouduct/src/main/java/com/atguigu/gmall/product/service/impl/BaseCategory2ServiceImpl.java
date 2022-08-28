@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product.service.impl;
 
 import com.atguigu.gmall.model.product.BaseCategory2;
+import com.atguigu.gmall.model.to.CategoryTreeTo;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,18 +20,27 @@ import java.util.List;
 */
 @Service
 public class BaseCategory2ServiceImpl extends ServiceImpl<BaseCategory2Mapper, BaseCategory2>
-    implements BaseCategory2Service{
+    implements BaseCategory2Service {
 
     @Resource
     BaseCategory2Mapper baseCategory2Mapper;
-//    根据一级分类id查询出所有二级分类
+
+    //    根据一级分类id查询出所有二级分类
     @Override
     public List<BaseCategory2> getCategory1Child(Long c1Id) {
         QueryWrapper<BaseCategory2> wrapper = new QueryWrapper<>();
-        wrapper.eq("category1_id",c1Id);
+        wrapper.eq("category1_id", c1Id);
         List<BaseCategory2> baseCategory2List = baseCategory2Mapper.selectList(wrapper);
         return baseCategory2List;
     }
+
+    @Override
+    public List<CategoryTreeTo> getAllCategoryWithTree() {
+
+
+        return baseCategory2Mapper.getAllCategoryWithTree();
+    }
+
 }
 
 
