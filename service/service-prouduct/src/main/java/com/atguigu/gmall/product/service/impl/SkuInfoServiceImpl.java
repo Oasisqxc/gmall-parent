@@ -112,8 +112,12 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         //查询当前sku对应的spu定义的所有销售属性名和值（固定好顺序）并且标记好当前sku属于哪一种组
        List<SpuSaleAttr> saleAttrList= spuSaleAttrService.getSaleAttrAndValueMarkSku(skuInfo.getSpuId(),skuId);
        detailTo.setSpuSaleAttrList(saleAttrList);
-
-       return detailTo;
+//        7.商品（sku）的所有兄弟产品的销售属性名和值组合关系全部查出来，并封装成
+//        {"118|120": "50","119|121": 50} 这样的json字符串
+        Long spuId = skuInfo.getSpuId();
+       String valuejson = spuSaleAttrService.getAllSkuSaleAttrValueJson(spuId);
+       detailTo.setValuesSkuJson(valuejson);
+        return detailTo;
     }
 
     @Override

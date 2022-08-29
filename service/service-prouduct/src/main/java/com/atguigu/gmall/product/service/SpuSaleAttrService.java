@@ -16,6 +16,8 @@ public interface SpuSaleAttrService extends IService<SpuSaleAttr> {
 
     List<SpuSaleAttr> getSaleAttrAndValueMarkSku(Long spuId, Long skuId);
 
+    String getAllSkuSaleAttrValueJson(Long spuId);
+
 
 //根据spuId查询对应的所有销售属性名和值
 
