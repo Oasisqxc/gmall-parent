@@ -1,6 +1,7 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -9,16 +10,27 @@ import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SkuDetailServiceImpl implements SkuDetailService {
-
+    /**
+     * Map作为缓存【本地缓存】：优缺点
+     * 优点：
+     * 缺点：
+     * 1、100w的数据内存够不够
+     */
+//    private Map<Long, SkuDetailTo> skuCache = new ConcurrentHashMap<>();
 
     @Autowired
     SkuDetailFeignClient skuDetailFeignClient;
@@ -26,8 +38,11 @@ public class SkuDetailServiceImpl implements SkuDetailService {
     @Autowired
     ThreadPoolExecutor executor;//可配置的线程池，可自动注入
 
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+    //未缓存优化前 - 400/s
+    public SkuDetailTo getSkuDetailFromRpc(Long skuId) {
 
         SkuDetailTo detailTo = new SkuDetailTo();
 
@@ -73,9 +88,60 @@ public class SkuDetailServiceImpl implements SkuDetailService {
             detailTo.setCategoryView(categoryView.getData());
         }, executor);
 
-         CompletableFuture.allOf(imageFuture,skuValueJsonFuture, priceFuture,
-                 attrAndValueFuture, categoryViewFuture).join();
+        CompletableFuture.allOf(imageFuture, skuValueJsonFuture, priceFuture,
+                attrAndValueFuture, categoryViewFuture).join();
 
         return detailTo;
     }
+
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+//        1.先看缓存中有没有数据 sku:info:55
+
+        String stringInfo = redisTemplate.opsForValue().get("sku:info:" + skuId);
+       if ("x".equals(stringInfo)){
+//           说明以前查过，只不过数据库没有此记录，为了避免再次回源，缓存了一个占位符
+           return null;
+       }
+
+        if (StringUtils.isEmpty(stringInfo)) {
+            // 没有缓存,回源
+            SkuDetailTo fromRpc = getSkuDetailFromRpc(skuId);
+            String catchJson = "x";
+            if (fromRpc != null) {
+                catchJson = Jsons.toStr(fromRpc);
+//            放入缓存
+                redisTemplate.opsForValue().set("sku:info:" + skuId, catchJson,
+                        7, TimeUnit.DAYS);
+            } else {
+                redisTemplate.opsForValue().set("sku:info:" + skuId, catchJson, 30, TimeUnit.MINUTES);
+            }
+
+            return fromRpc;
+
+        }
+
+//       有缓存
+//        把json转成指定对象
+        SkuDetailTo skuDetailTo = Jsons.toObj(stringInfo, SkuDetailTo.class);
+
+        return skuDetailTo;
+    }
+
+
+
+   /* //  使用本地缓存
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+//1.先看缓存
+        SkuDetailTo catchDeta = skuCache.get(skuId);
+        if (catchDeta==null){
+//            没有缓存
+            SkuDetailTo fromRpc = getSkuDetailFromRpc(skuId);
+            skuCache.put(skuId,fromRpc);
+            return fromRpc;
+        }
+
+        return catchDeta;
+    }*/
 }

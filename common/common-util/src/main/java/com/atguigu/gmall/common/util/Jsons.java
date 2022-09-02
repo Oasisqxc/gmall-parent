@@ -21,5 +21,18 @@ public class Jsons {
         }
 
     }
+// 把json转成指定的对象
+    public static<T> T toObj(String stringInfo,
+                             Class<T> clz) {
+
+        T t = null;
+        try {
+            t = mapper.readValue(stringInfo, clz);
+            return t;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
