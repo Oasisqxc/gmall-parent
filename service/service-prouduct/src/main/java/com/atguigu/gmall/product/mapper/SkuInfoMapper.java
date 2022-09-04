@@ -6,6 +6,7 @@ import com.sun.org.apache.xml.internal.security.Init;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
 * @author hp
@@ -21,6 +22,8 @@ public interface SkuInfoMapper extends BaseMapper<SkuInfo> {
 
 //  查询一个商品的实时价格
     BigDecimal getRealPrice(@Param("skuId") Long skuId);
+
+    List<Long> getAllSkuId();
 }
 
 

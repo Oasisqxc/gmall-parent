@@ -29,4 +29,6 @@ public interface SkuInfoService extends IService<SkuInfo> {
     SkuInfo getDetailSkuInfo(Long skuId);
 // 获取sku的所有图片
     List<SkuImage> getDetailSkuImages(Long skuId);
+//查出所有的skuid
+    List<Long> findAllSkuId();
 }

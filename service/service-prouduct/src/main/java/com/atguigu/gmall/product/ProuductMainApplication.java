@@ -1,6 +1,7 @@
 package com.atguigu.gmall.product;
 
 import com.atguigu.gmall.common.annotation.EnableThreadPool;
+import com.atguigu.gmall.common.config.RedissonAutoConfiguration;
 import com.atguigu.gmall.common.config.Swagger2Config;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 //自动扫描这个包下的所有Mapper接口
 @EnableThreadPool
-@Import(Swagger2Config.class)
+@Import({Swagger2Config.class, RedissonAutoConfiguration.class})
 @MapperScan(basePackages = "com.atguigu.gmall.product.mapper")
 @SpringCloudApplication
 public class ProuductMainApplication {

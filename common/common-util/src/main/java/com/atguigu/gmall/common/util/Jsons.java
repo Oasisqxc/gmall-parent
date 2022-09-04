@@ -3,6 +3,7 @@ package com.atguigu.gmall.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.StringUtils;
 
 
 public class Jsons {
@@ -21,10 +22,13 @@ public class Jsons {
         }
 
     }
-// 把json转成指定的对象
-    public static<T> T toObj(String stringInfo,
-                             Class<T> clz) {
 
+    // 把json转成指定的对象
+    public static <T> T toObj(String stringInfo,
+                              Class<T> clz) {
+        if (StringUtils.isEmpty(stringInfo)) {
+            return null;
+        }
         T t = null;
         try {
             t = mapper.readValue(stringInfo, clz);

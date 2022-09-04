@@ -1,9 +1,12 @@
 package com.atguigu.gmall.item;
 
 import com.atguigu.gmall.common.annotation.EnableThreadPool;
+import com.atguigu.gmall.common.config.RedissonAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Import;
+
 /**
  * 1、公共的配置搬家放到 service-util
  * 2、当前项目依赖了 service-util
@@ -12,6 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * - com.atguigu.gmall.item.*****
  * - com.atguigu.gmall.common.**
  */
+@Import(RedissonAutoConfiguration.class)
 @EnableThreadPool
 @EnableFeignClients
 @SpringCloudApplication
