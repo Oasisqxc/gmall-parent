@@ -35,7 +35,17 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.atguigu.gmall</groupId>
+            <artifactId>mall-cache-starter</artifactId>
+            <version>1.0</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.atguigu.gmall</groupId>
+            <artifactId>mall-cache-starter</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 <!--打包插件-->
     <build>

@@ -3,7 +3,6 @@ package com.atguigu.gmall.item.service.impl;
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.util.Jsons;
-import com.atguigu.gmall.item.cache.CacheOpsService;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
@@ -11,6 +10,8 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.service.CacheOpsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,6 +25,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
 @Slf4j
 @Service
 public class SkuDetailServiceImpl implements SkuDetailService {
@@ -34,7 +37,10 @@ public class SkuDetailServiceImpl implements SkuDetailService {
      * 1、100w的数据内存够不够
      */
 //    private Map<Long, SkuDetailTo> skuCache = new ConcurrentHashMap<>();
-
+    //每个skuId，关联一把自己的锁
+    Map<Long, ReentrantLock> lockPool = new ConcurrentHashMap<>();
+    //锁的粒度太大了，把无关的人都锁住了
+    ReentrantLock lock = new ReentrantLock(); //锁的住
     @Autowired
     SkuDetailFeignClient skuDetailFeignClient;
 
@@ -147,8 +153,8 @@ public class SkuDetailServiceImpl implements SkuDetailService {
         return skuDetailTo;
     }
 
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {
+
+    public SkuDetailTo getSkuDetailWithCache(Long skuId) {
 
         String cacheKey = SysRedisConst.SKU_INFO_PREFEIX + skuId;
 
@@ -192,6 +198,23 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 //       3.2 缓存中有
         return cacheData;
 
+    }
+    /**
+     * 表达式中的params代表方法的所有参数列表
+     * @param skuId
+     * @return
+     */
+    @GmallCache(
+            cacheKey =SysRedisConst.SKU_INFO_PREFEIX+"#{#params[0]}",
+            bloomName = SysRedisConst.BLOOM_SKUID,
+            bloomValue = "#{#params[0]}",
+            lockName = SysRedisConst.LOCK_SKU_DETAIL+"#{#params[0]}"
+    )
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+
+        SkuDetailTo fromRpc = getSkuDetailFromRpc(skuId);
+        return fromRpc;
     }
 
 
