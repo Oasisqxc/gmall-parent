@@ -63,4 +63,12 @@ public class SkuController {
 
         return Result.ok();
     }
+
+//    修改sku信息
+    public void updateSkuInfo(SkuInfo skuInfo){
+
+//        skuInfoService.updateSkuInfo(skuInfo);
+
+    }
+
 }

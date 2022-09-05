@@ -17,6 +17,9 @@ spring:
   redis:
     host: 192.168.200.100
     password: Lfy123456
+  profiles:
+    include: sharding #包含的文件不用区分激活的profile
+
 #自定义配置
 app:
   minio:

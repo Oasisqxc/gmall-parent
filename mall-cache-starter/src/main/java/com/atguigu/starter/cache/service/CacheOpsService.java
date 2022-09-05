@@ -58,6 +58,7 @@ public interface CacheOpsService {
      * @param fromRpc
      */
     void saveData(String cacheKey, Object fromRpc);
+    void saveData(String cacheKey, Object fromRpc,Long dataTtl);
 
     /**
      * 解锁
@@ -71,4 +72,7 @@ public interface CacheOpsService {
      * @param lockName
      */
     void unlock(String lockName);
+
+//    延迟双删
+    void delay2Delete(String cacheKey);
 }
