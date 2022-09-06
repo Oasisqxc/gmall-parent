@@ -4,19 +4,19 @@ server:
 #    max-connections: 200 #我们的内存支持不了8000连接
 
 spring:
-  zipkin:
-    sender:
-      type: web
-    base-url: http://192.168.200.100:9411/
+#  zipkin:
+#    sender:
+#      type: web
+#    base-url: http://192.168.200.100:9411/
     #数据源配置好
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: 123456
     url: jdbc:mysql://192.168.200.100:3306/gmall_product?useSSL=false&characterEncoding=utf-8
-  redis:
-    host: 192.168.200.100
-    password: Lfy123456
+#  redis:
+#    host: 192.168.200.100
+#    password: Lfy123456
   profiles:
     include: sharding #包含的文件不用区分激活的profile
 
