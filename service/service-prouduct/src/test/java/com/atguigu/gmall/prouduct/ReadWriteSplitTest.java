@@ -21,7 +21,7 @@ public class ReadWriteSplitTest {
         BaseTrademark trademark = baseTrademarkMapper.selectById(4L);
         System.out.println("trademark = " + trademark);
 
-        trademark.setTmName("小米-plus");
+        trademark.setTmName("小米");
         baseTrademarkMapper.updateById(trademark);
 
         //改完后，再去查询，很可能查不到最新结果
