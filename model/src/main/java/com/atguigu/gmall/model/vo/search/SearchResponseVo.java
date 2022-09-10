@@ -16,7 +16,7 @@ public class SearchResponseVo{
 //    平台属性面包屑
     private List<SearchAttr> propsParamList;
 //    以上面包屑ok
-
+//  品牌列表
     private List<TrademarkVo> trademarkList;
 //    所有属性列表
     private List<AttrVo> attrsList;
