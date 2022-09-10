@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 @SpringBootTest
 public class EsTest {
 
@@ -47,5 +49,13 @@ public class EsTest {
          personRepository.save(person3);
 
         System.out.println("完成........");
+    }
+
+    @Test
+    void testQuery(){
+        List<Person> 西安市 = personRepository.findAllByAddress("西安市");
+        for (Person person : 西安市) {
+            System.out.println("person = " + person);
+        }
     }
 }

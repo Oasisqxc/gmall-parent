@@ -1,19 +1,20 @@
 package com.atguigu.gmall.product.service.impl;
+import com.atguigu.gmall.feign.search.SearchFeignClient;
+import com.atguigu.gmall.model.list.SearchAttr;
+import java.util.Date;
 
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.model.list.Goods;
 import com.atguigu.gmall.model.product.*;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
 import com.atguigu.gmall.product.mapper.BaseCategory3Mapper;
-import com.atguigu.gmall.product.mapper.SpuInfoMapper;
 import com.atguigu.gmall.product.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.gmall.product.mapper.SkuInfoMapper;
-import org.apache.ibatis.annotations.Param;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,12 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    BaseTrademarkService baseTrademarkService;
+
+    @Autowired
+    SearchFeignClient searchFeignClient;
 
     @Transactional
     @Override
@@ -91,12 +98,18 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     public void updateOnSale(Long skuId) {
 //        商品上架  //1、改数据库 sku_info 这个skuId的is_sale； 1上架  0下架
         skuInfoMapper.updateIsSale(skuId,1);
+
+        Goods goods=getGoodsBySkuId(skuId);
+
+        searchFeignClient.saveGoods(goods);
+
     }
 
     @Override
     public void updateCancelSale(Long skuId) {
 //        商品下架
         skuInfoMapper.updateIsSale(skuId,0);
+        searchFeignClient.deleteGoods(skuId);
     }
 
     @Deprecated
@@ -157,6 +170,41 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         //分页查询。分批次查询。
 
         return skuInfoMapper.getAllSkuId();
+    }
+
+    @Override
+    public Goods getGoodsBySkuId(Long skuId) {
+//        得到某个sku在es中需要存储的所有数据
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        Goods goods = new Goods();
+        goods.setId(skuId);
+        goods.setDefaultImg(skuInfo.getSkuDefaultImg());
+        goods.setTitle(skuInfo.getSkuName());
+        goods.setPrice(skuInfo.getPrice().doubleValue());
+        goods.setCreateTime(new Date());
+        goods.setTmId(skuInfo.getTmId());
+
+        BaseTrademark trademark = baseTrademarkService.getById(skuInfo.getTmId());
+        goods.setTmName(trademark.getTmName());
+        goods.setTmLogoUrl(trademark.getLogoUrl());
+
+        Long category3Id = skuInfo.getCategory3Id();
+        CategoryViewTo view = baseCategory3Mapper.getCategoryView(category3Id);
+        goods.setCategory1Id(view.getCategory1Id());
+        goods.setCategory1Name(view.getCategory1Name());
+        goods.setCategory2Id(view.getCategory2Id());
+        goods.setCategory2Name(view.getCategory2Name());
+        goods.setCategory3Id(view.getCategory3Id());
+        goods.setCategory3Name(view.getCategory3Name());
+
+        goods.setHotScore(0L);// TODO: 2022/9/8 热度分
+
+//        查询当前sku所有平台属性名和值
+       List<SearchAttr> attrs= skuAttrValueService.getSkuAttrNameAndValue(skuId);
+        goods.setAttrs(attrs);
+
+
+        return goods;
     }
 }
 
