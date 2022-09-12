@@ -7,6 +7,8 @@ import com.atguigu.gmall.model.vo.search.SearchResponseVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @FeignClient("service-search")
 @RequestMapping("/api/inner/rpc/search")
 public interface SearchFeignClient {
@@ -22,4 +24,12 @@ public interface SearchFeignClient {
     //    搜索页面展示数据
     @PostMapping("/goods/search")
     public Result<SearchResponseVo> search(@RequestBody SearchParamVo paramVo);
+
+    //更新热度分
+    @GetMapping("/goods/hotscore/{skuId}")
+    public Result updateHotScore(@PathVariable("skuId") Long skuId,
+                                 @RequestParam("score") Long score
+    );
+
+
 }

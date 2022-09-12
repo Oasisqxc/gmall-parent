@@ -68,6 +68,17 @@ public class GoodsServiceImpl implements GoodsService {
         return responseVo;
     }
 
+//    更新热度分
+    @Override
+    public void updateHotScore(Long skuId, Long score) {
+//        1.找到商品
+        Goods goods = goodsRepository.findById(skuId).get();
+//        2.更新得分
+        goods.setHotScore(score);
+//        3.同步到es
+        goodsRepository.save(goods);
+    }
+
     //    根据搜索到的记录构建响应结果
     private SearchResponseVo buildSearchResponseResult(SearchHits<Goods> goods, SearchParamVo paramVo) {
 

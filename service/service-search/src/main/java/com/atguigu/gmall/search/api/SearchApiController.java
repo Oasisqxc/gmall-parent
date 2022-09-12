@@ -8,6 +8,9 @@ import com.atguigu.gmall.search.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/inner/rpc/search")
 public class SearchApiController {
@@ -37,5 +40,18 @@ public class SearchApiController {
 
  SearchResponseVo responseVo= goodsService.search(paramVo);
         return Result.ok(responseVo);
+    }
+
+//更新热度分
+    @GetMapping("/goods/hotscore/{skuId}")
+    public Result updateHotScore(@PathVariable("skuId") Long skuId,
+                                 @RequestParam("score") Long score,
+                                 HttpServletResponse response
+                                 ){
+        goodsService.updateHotScore(skuId,score);
+
+//
+        return Result.ok();
+
     }
 }
