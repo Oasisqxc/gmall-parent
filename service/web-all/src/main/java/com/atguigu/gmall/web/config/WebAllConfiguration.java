@@ -27,6 +27,10 @@ public class WebAllConfiguration {
 
 //            将用户id头添加到feign的新请求中
             template.header(SysRedisConst.USERID_HEADER,userId);
+
+//            临时id也透传
+           String tempId = request.getHeader(SysRedisConst.USERTEMPID_HEADER);
+           template.header(SysRedisConst.USERTEMPID_HEADER,tempId);
         };
     }
 }

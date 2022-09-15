@@ -15,6 +15,7 @@ public class GmallException extends RuntimeException {
     @ApiModelProperty(value = "异常状态码")
     private Integer code;
 
+    private ResultCodeEnum codeEnum;
     /**
      * 通过状态码和错误消息创建异常对象
      * @param message
@@ -23,6 +24,7 @@ public class GmallException extends RuntimeException {
     public GmallException(String message, Integer code) {
         super(message);
         this.code = code;
+
     }
 
     /**
@@ -32,6 +34,7 @@ public class GmallException extends RuntimeException {
     public GmallException(ResultCodeEnum resultCodeEnum) {
         super(resultCodeEnum.getMessage());
         this.code = resultCodeEnum.getCode();
+        this.codeEnum=resultCodeEnum;
     }
 
     @Override
@@ -41,4 +44,6 @@ public class GmallException extends RuntimeException {
                 ", message=" + this.getMessage() +
                 '}';
     }
+
+
 }

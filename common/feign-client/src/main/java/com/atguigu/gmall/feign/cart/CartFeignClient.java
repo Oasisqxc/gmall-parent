@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@RequestMapping("")
+@RequestMapping("/api/inner/rpc/cart")
 @FeignClient("service-cart")
 public interface CartFeignClient {
     /**
@@ -16,8 +16,12 @@ public interface CartFeignClient {
      * @param num
      * @return  把那个商品添加到了购物车
      */
-    @GetMapping("/addCart")
-    public Result<SkuInfo> addToCart(@RequestParam("skuId") Long skuId,
+    @GetMapping("/addToCart")
+    public Result<Object> addToCart(@RequestParam("skuId") Long skuId,
                                      @RequestParam("num") Integer num
     );
+
+    //    删除购物车中商品 /cart/deleteChecked
+    @GetMapping("/deleteChecked")
+    public Result deleteChecked();
 }
