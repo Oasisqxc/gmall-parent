@@ -38,4 +38,7 @@ List<CartInfo>   getCheckedItems(String cartKey);
 
 // 合并购物车
     void mergeUserAndTempCart();
+
+//    更新购物车中所有商品的价格
+   void updateCartAllItemsPrice(String cartKey, List<CartInfo> cartInfos);
 }
