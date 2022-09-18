@@ -4,13 +4,12 @@ import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.common.util.MD5;
 import com.atguigu.gmall.model.user.UserInfo;
-import com.atguigu.gmall.model.vo.search.search.LoginSuccessVo;
+import com.atguigu.gmall.model.vo.user.LoginSuccessVo;
 import com.atguigu.gmall.user.service.UserInfoService;
 import com.atguigu.gmall.user.mapper.UserInfoMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 

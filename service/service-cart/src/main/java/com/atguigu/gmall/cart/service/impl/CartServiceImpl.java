@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
+import com.atguigu.gmall.model.vo.user.UserAuthInfo;
 import com.google.common.collect.Lists;
 
 import com.atguigu.gmall.cart.service.CartService;
@@ -15,7 +16,6 @@ import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
-import com.atguigu.gmall.model.vo.search.user.UserAuthInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -137,7 +137,7 @@ public class CartServiceImpl implements CartService {
         executor.submit(()->{
 //            绑定请求到这个线程
             RequestContextHolder.setRequestAttributes(requestAttributes);
-            updateCartAllItemsPrice(cartKey,infos);
+            updateCartAllItemsPrice(cartKey);
 //            3.移除数据
             RequestContextHolder.resetRequestAttributes();
         });
@@ -248,23 +248,29 @@ public class CartServiceImpl implements CartService {
 
 //    更新购物车中所有商品的价格
     @Override
-    public void updateCartAllItemsPrice(String cartKey, List<CartInfo> cartInfos) {
+    public void updateCartAllItemsPrice(String cartKey) {
 //        拿到购物车
         BoundHashOperations<String, String, String> cartOps
                 = redisTemplate.boundHashOps(cartKey);
         System.out.println("更新价格启动:" + Thread.currentThread());
 
-        cartInfos.stream()
-                .forEach(cartInfo -> {
+        cartOps.values()
+                        .stream()
+                                .map(str -> Jsons.toObj(str,CartInfo.class)
+                                        ).forEach(cartInfo -> {
 //                    1.查出最新价格
                     Result<BigDecimal> price =
                             skuFeignClient.getSku1010Price(cartInfo.getSkuId());
 //                    2.设置新价格
                     cartInfo.setSkuPrice(price.getData());
                     cartInfo.setUpdateTime(new Date());
-//                    3.更新购物车价格
-                    cartOps.put(cartInfo.getSkuId().toString(),Jsons.toStr(cartInfo));
-//
+
+//   100%防得住
+            if (cartOps.hasKey(cartInfo.getSkuId().toString())){
+                //                    3.更新购物车价格
+                cartOps.put(cartInfo.getSkuId().toString(),Jsons.toStr(cartInfo));
+            }
+
                 });
 
         System.out.println("更新价格结束:" + Thread.currentThread());

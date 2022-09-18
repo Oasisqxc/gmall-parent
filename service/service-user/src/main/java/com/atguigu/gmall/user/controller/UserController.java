@@ -3,7 +3,7 @@ package com.atguigu.gmall.user.controller;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.model.user.UserInfo;
-import com.atguigu.gmall.model.vo.search.search.LoginSuccessVo;
+import com.atguigu.gmall.model.vo.user.LoginSuccessVo;
 import com.atguigu.gmall.user.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

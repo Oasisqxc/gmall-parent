@@ -21,4 +21,8 @@ public class SysRedisConst {
     public static final Integer CART_ITEM_NUM_LIMIT =200 ;
 //    购物车商品条目总限制
     public static final Integer CART_ITEMS_LIMIT =2 ;
+    public static final String ORDER_TEMP_TOKEN ="order:temptoken:"; //order:temptoken:交易号 ;
+    //订单超时关闭时间
+    public static final int ORDER_CLOSE_TTL = 60*45; //秒为单位;
+    public static final int ORDER_REFUND_TTL = 60*60*24*30;
 }

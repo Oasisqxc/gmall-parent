@@ -1,7 +1,7 @@
 package com.atguigu.gmall.user.service;
 
 import com.atguigu.gmall.model.user.UserInfo;
-import com.atguigu.gmall.model.vo.search.search.LoginSuccessVo;
+import com.atguigu.gmall.model.vo.user.LoginSuccessVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
