@@ -3,8 +3,11 @@ import java.math.BigDecimal;
 
 import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.SysRedisConst;
+import com.atguigu.gmall.common.util.Jsons;
+import com.atguigu.gmall.constant.MqConst;
 import com.atguigu.gmall.model.enums.OrderStatus;
 import com.atguigu.gmall.model.enums.ProcessStatus;
+import com.atguigu.gmall.model.to.mq.OrderMsg;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import com.atguigu.gmall.model.activity.CouponInfo;
@@ -16,6 +19,7 @@ import com.atguigu.gmall.order.service.OrderDetailService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.gmall.order.service.OrderInfoService;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +41,9 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Autowired
     OrderDetailService orderDetailService;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 //针对表【order_info(订单表 订单表)】的数据库操作Service实现
     @Transactional
     @Override
@@ -50,11 +57,34 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 //        所有订单明细
         List<OrderDetail> details= prepareOrderDetail(submitVo,orderInfo);
         orderDetailService.saveBatch(details);
+
+        //发送订单创建完成消息
+        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(),orderInfo.getUserId());
+        rabbitTemplate.convertAndSend(
+                MqConst.EXCHANGE_ORDER_EVNT,
+                MqConst.RK_ORDER_CREATED,
+                Jsons.toStr(orderMsg)
+        );
+
 //        3.返回订单id
         return orderInfo.getId();
     }
 
-//    订单明细
+//    关闭订单
+    @Override
+    public void changeOrderStatus(Long orderId, Long userId,
+                                  ProcessStatus closed, List<ProcessStatus> expected) {
+        String orderStatus = closed.getOrderStatus().name();
+        String processStatus = closed.name();
+
+        List<String> expects = expected.stream()
+                .map(status ->
+                        status.name()).collect(Collectors.toList());
+//        幂等修改订单
+        orderInfoMapper.updateOrderStatus(orderId,userId,processStatus,orderStatus,expects);
+    }
+
+    //    订单明细
     private List<OrderDetail> prepareOrderDetail(OrderSubmitVo submitVo, OrderInfo orderInfo) {
         List<OrderDetail> detailList = submitVo.getOrderDetailList().stream()
                 .map(vo -> {

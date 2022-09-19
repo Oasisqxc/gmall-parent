@@ -18,4 +18,7 @@ public interface OrderBizService {
 
 //    提交订单
     Long submitOrder(OrderSubmitVo submitVo, String tradeNo);
+
+//    关闭订单
+    void closeOrder(Long orderId,Long userId);
 }

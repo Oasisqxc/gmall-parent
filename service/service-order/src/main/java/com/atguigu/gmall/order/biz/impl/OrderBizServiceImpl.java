@@ -10,6 +10,7 @@ import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.feign.user.UserFeignClient;
 import com.atguigu.gmall.feign.ware.WareFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
@@ -206,18 +207,22 @@ public class OrderBizServiceImpl implements OrderBizService {
 //        5.清除购物车选中的数据
         cartFeignClient.deleteChecked();
 
-//        45min不支付就要关闭
-     /*   //45min不支付就要关闭。
-        ScheduledExecutorService pool = Executors.newScheduledThreadPool(10);
-        pool.schedule(()->{
-            closeOrder(orderId);
-        },45,TimeUnit.MINUTES);*/
+
 
         return orderId;
     }
 
-//    @Scheduled(cron = "0 */5 * * * ?")
-//    public void closeOrder(Long orderId){
-//
-//    }
+//    关闭订单
+    @Override
+    public void closeOrder(Long orderId, Long userId) {
+        ProcessStatus closed = ProcessStatus.CLOSED;
+// 如果是未支付或者已结束才可以关闭订单
+        List<ProcessStatus> expected
+                = Arrays.asList(ProcessStatus.UNPAID, ProcessStatus.FINISHED);
+
+        orderInfoService.changeOrderStatus(orderId,userId,closed,expected);
+
+    }
+
+
 }
