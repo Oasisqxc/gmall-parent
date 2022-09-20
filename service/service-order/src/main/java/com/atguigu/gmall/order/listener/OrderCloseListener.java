@@ -19,11 +19,16 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class OrderCloseListener {
-    @Autowired
     StringRedisTemplate redisTemplate;
 
-    @Autowired
     OrderBizService orderBizService;
+
+
+    public OrderCloseListener(StringRedisTemplate redisTemplate,
+                              OrderBizService orderBizService){
+        this.redisTemplate = redisTemplate;
+        this.orderBizService = orderBizService;
+    }
 
     @RabbitListener(queues = MqConst.QUEUE_ORDER_DEAD)
     public void orderClose(Message message, Channel channel) throws IOException {
@@ -39,7 +44,8 @@ public class OrderCloseListener {
         }catch (Exception e){
             log.error("订单关闭业务失败。消息：{}，失败原因：{}",orderMsg,e);
             //lua脚本
-            Long aLong = redisTemplate.opsForValue().increment(SysRedisConst.MQ_RETRY + "order:" + orderMsg.getOrderId());
+            Long aLong = redisTemplate.opsForValue().
+                    increment(SysRedisConst.MQ_RETRY + "order:" + orderMsg.getOrderId());
             if(aLong <= 10){
                 channel.basicNack(tag,false,true);
             }else {

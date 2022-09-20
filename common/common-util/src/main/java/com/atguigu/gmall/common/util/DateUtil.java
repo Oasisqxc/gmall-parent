@@ -5,6 +5,7 @@ import org.apache.commons.lang.time.DateUtils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * 日期操作工具类
@@ -31,6 +32,12 @@ public class DateUtil {
      */
     public static String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        return sdf.format(date);
+
+    }
+
+ public static String formatDate(Date date, String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.format(date);
 
     }

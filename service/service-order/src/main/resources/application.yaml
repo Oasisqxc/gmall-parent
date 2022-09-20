@@ -30,3 +30,6 @@ spring:
 
 app:
   ware-url: http://localhost:9001/
+feign:
+  sentinel:
+    enabled: true
